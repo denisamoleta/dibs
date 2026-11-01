@@ -1,6 +1,8 @@
+import { Suspense } from "react"
 import type { Metadata, Viewport } from "next"
 import { Bricolage_Grotesque, Geist, Geist_Mono } from "next/font/google"
 import { themeScript } from "@/components/theme"
+import { UsageBeacon } from "@/components/usage-beacon"
 import { Toaster } from "@/components/ui/sonner"
 import { TooltipProvider } from "@/components/ui/tooltip"
 import { site, siteUrl } from "@/lib/site"
@@ -70,6 +72,9 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           {children}
           <Toaster position="top-center" />
         </TooltipProvider>
+        <Suspense fallback={null}>
+          <UsageBeacon />
+        </Suspense>
       </body>
     </html>
   )

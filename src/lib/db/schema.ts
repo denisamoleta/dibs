@@ -3,6 +3,7 @@ import {
   index,
   integer,
   pgTable,
+  primaryKey,
   text,
   timestamp,
   uuid,
@@ -71,6 +72,33 @@ export const rateLimits = pgTable("rate_limits", {
   count: integer("count").notNull().default(0),
   windowStart: timestamp("window_start", { withTimezone: true }).notNull().defaultNow(),
 })
+
+// ---- Privacy-friendly usage stats (aggregates only; no cookies, no raw IPs) ----
+
+/** Daily counters, e.g. ("2026-11-01", "pageview", "home") → 42. */
+export const analyticsDaily = pgTable(
+  "analytics_daily",
+  {
+    day: date("day", { mode: "string" }).notNull(),
+    metric: varchar("metric", { length: 32 }).notNull(),
+    dim: varchar("dim", { length: 96 }).notNull().default(""),
+    count: integer("count").notNull().default(0),
+  },
+  (t) => [primaryKey({ columns: [t.day, t.metric, t.dim] })],
+)
+
+/**
+ * One row per visitor per day, keyed by a salted hash that includes the date, so the
+ * same person can't be linked across days. Used only to count daily uniques; pruned after 2 days.
+ */
+export const analyticsVisitors = pgTable(
+  "analytics_visitors",
+  {
+    day: date("day", { mode: "string" }).notNull(),
+    hash: varchar("hash", { length: 32 }).notNull(),
+  },
+  (t) => [primaryKey({ columns: [t.day, t.hash] })],
+)
 
 export type SheetRow = typeof sheets.$inferSelect
 export type ItemRow = typeof items.$inferSelect

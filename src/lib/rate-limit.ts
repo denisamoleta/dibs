@@ -8,6 +8,7 @@ import { hashSecret } from "./tokens"
 export const RATE_LIMITS = {
   createSheet: { limit: 15, windowSec: 60 * 60 },
   write: { limit: 120, windowSec: 10 * 60 },
+  admin: { limit: 60, windowSec: 10 * 60 },
 } as const
 
 type Bucket = keyof typeof RATE_LIMITS

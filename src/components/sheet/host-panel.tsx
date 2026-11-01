@@ -25,6 +25,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { copyText, downloadFile, slugify } from "@/lib/browser"
 import { toCsv } from "@/lib/summary"
+import { track } from "@/lib/track"
 import type { SheetDTO } from "@/lib/types"
 import { cn } from "@/lib/utils"
 import { CopyListMenu, MessengerLinks, ShareButton } from "./share-actions"
@@ -94,7 +95,13 @@ export function HostPanel({
         </DropdownMenu>
       </div>
 
-      <LinkField className="mt-4" label="Guest link" value={guestUrl} copyLabel="Copy link" />
+      <LinkField
+        className="mt-4"
+        label="Guest link"
+        value={guestUrl}
+        copyLabel="Copy link"
+        onCopied={() => track("share", "copy")}
+      />
 
       <div className="mt-3 flex flex-wrap gap-2">
         <ShareButton sheet={sheet} url={guestUrl} />
@@ -156,12 +163,14 @@ function LinkField({
   copyLabel,
   masked = false,
   className,
+  onCopied,
 }: {
   label: string
   value: string
   copyLabel: string
   masked?: boolean
   className?: string
+  onCopied?: () => void
 }) {
   const [copied, setCopied] = useState(false)
   const display = masked && value ? value.replace(/(manage=)(.{4}).+(.{4})$/, "$1$2••••••••$3") : value
@@ -180,6 +189,7 @@ function LinkField({
         disabled={!value}
         onClick={async () => {
           if (await copyText(value)) {
+            onCopied?.()
             setCopied(true)
             toast.success(`${label} copied`)
             setTimeout(() => setCopied(false), 1800)

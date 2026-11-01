@@ -31,6 +31,24 @@ export function formatDate(iso: string, referenceYear?: number): string {
     : dateFmtYear.format(date)
 }
 
+/** Always includes the year, e.g. "Thu, Nov 26, 2026". */
+export function formatDateLong(iso: string): string {
+  return dateFmtYear.format(isoToUtcDate(iso))
+}
+
+/** Local calendar date → "YYYY-MM-DD" (no time zone shifting). */
+export function toIsoDate(date: Date): string {
+  const pad = (n: number) => String(n).padStart(2, "0")
+  return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
+}
+
+/** "YYYY-MM-DD" → local Date at midnight, for date pickers. */
+export function fromIsoDate(iso: string): Date | undefined {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(iso)) return undefined
+  const [y, m, d] = iso.split("-").map(Number)
+  return new Date(y, m - 1, d)
+}
+
 export function formatTime(hhmm: string): string {
   const [h, m] = hhmm.split(":").map(Number)
   const suffix = h >= 12 ? "PM" : "AM"

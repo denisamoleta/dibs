@@ -32,6 +32,9 @@
   --color-highlight: var(--highlight);
   --color-highlight-foreground: var(--highlight-foreground);
   --color-tomato-soft: var(--tomato-soft);
+  --color-chart-accent: var(--chart-accent);
+  --color-chart-muted: var(--chart-muted);
+  --color-chart-grid: var(--chart-grid);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -66,6 +69,10 @@
   --highlight: oklch(0.94 0.1 95);
   --highlight-foreground: oklch(0.33 0.06 80);
   --tomato-soft: oklch(0.945 0.04 40);
+  /* Chart tokens (validated: L-band, chroma floor, >=3:1 vs surface). */
+  --chart-accent: oklch(0.55 0.19 33);
+  --chart-muted: oklch(0.88 0.012 75);
+  --chart-grid: oklch(0.92 0.01 75);
   --radius: 0.75rem;
   --shadow-paper: 0 1px 0 oklch(0.22 0.02 50 / 4%), 0 8px 24px -12px oklch(0.3 0.04 50 / 18%);
 }
@@ -94,6 +101,9 @@
   --highlight: oklch(0.36 0.07 90);
   --highlight-foreground: oklch(0.93 0.09 95);
   --tomato-soft: oklch(0.3 0.06 40);
+  --chart-accent: oklch(0.65 0.17 38);
+  --chart-muted: oklch(0.34 0.012 55);
+  --chart-grid: oklch(1 0 0 / 8%);
   --shadow-paper: 0 1px 0 oklch(1 0 0 / 4%) inset, 0 10px 30px -14px oklch(0 0 0 / 60%);
 }
 

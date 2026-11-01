@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 
 export default function PrivacyPage() {
   return (
-    <ProsePage title="Privacy" updated="November 1, 2026">
+    <ProsePage title="Privacy" updated="November 1, 2026 (usage statistics added)">
       <p>
         Dibs is built to collect as little as possible. There are no accounts, no ads, no third-party trackers and
         no selling of data — ever.
@@ -27,6 +27,16 @@ export default function PrivacyPage() {
           Raw IP addresses aren&apos;t stored, and counters are deleted after a day.
         </li>
       </ul>
+
+      <h2>Anonymous usage statistics</h2>
+      <p>
+        To understand whether Dibs is useful, we count things in aggregate: page views per type of page, sheets
+        created, sign-ups, shares and app installs, plus which country (from your IP, never stored), device type
+        and referring website a visit came from. No cookies are used. To count daily visitors without tracking
+        anyone, we keep a one-way fingerprint that changes every day and is deleted after two days, so visits
+        can&apos;t be linked across days or back to you. If your browser sends Do Not Track or Global Privacy
+        Control, nothing is counted at all.
+      </p>
 
       <h2>What stays on your device</h2>
       <p>

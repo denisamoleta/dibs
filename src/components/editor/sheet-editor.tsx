@@ -15,6 +15,7 @@ import {
   Trash2Icon,
 } from "lucide-react"
 import { ConfirmDialog } from "@/components/confirm-dialog"
+import { DatePicker, TimeSelect } from "@/components/editor/date-time-fields"
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -185,6 +186,7 @@ export function SheetEditor(props: Props) {
       description,
       allowWriteIns,
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone,
+      template: props.mode === "create" ? template.id : undefined,
       website: honeypot.current?.value || undefined,
       items: rows
         .filter((r) => r.title.trim() || r.id)
@@ -319,38 +321,38 @@ export function SheetEditor(props: Props) {
 
         <div className="grid gap-4 sm:grid-cols-[1.3fr_1fr_1fr]">
           <Field id={fieldId("eventDate")} label="Date" error={err("eventDate")}>
-            <Input
+            <DatePicker
               id={fieldId("eventDate")}
-              type="date"
               value={eventDate}
-              onChange={(e) => {
-                setEventDate(e.target.value)
+              onChange={(v) => {
+                setEventDate(v)
                 clearError("eventDate")
+                touch()
               }}
-              aria-invalid={err("eventDate") ? true : undefined}
+              invalid={Boolean(err("eventDate"))}
             />
           </Field>
           <div className="grid grid-cols-2 gap-4 sm:contents">
             <Field id={fieldId("startTime")} label="Starts" error={err("startTime")}>
-              <Input
+              <TimeSelect
                 id={fieldId("startTime")}
-                type="time"
                 value={startTime}
-                onChange={(e) => {
-                  setStartTime(e.target.value)
+                emptyLabel="Start time"
+                onChange={(v) => {
+                  setStartTime(v)
                   clearError("startTime")
                   clearError("eventDate")
                 }}
-                aria-invalid={err("startTime") ? true : undefined}
+                invalid={Boolean(err("startTime"))}
               />
             </Field>
             <Field id={fieldId("endTime")} label="Ends" error={err("endTime")}>
-              <Input
+              <TimeSelect
                 id={fieldId("endTime")}
-                type="time"
                 value={endTime}
-                onChange={(e) => {
-                  setEndTime(e.target.value)
+                emptyLabel="End time"
+                onChange={(v) => {
+                  setEndTime(v)
                   clearError("startTime")
                 }}
               />

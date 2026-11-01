@@ -23,6 +23,7 @@ import {
 import { buildIcs, googleCalendarUrl } from "@/lib/calendar"
 import { canNativeShare, copyText, downloadFile, nativeShare, slugify } from "@/lib/browser"
 import { fullSummary, stillNeededSummary } from "@/lib/summary"
+import { track } from "@/lib/track"
 import type { SheetDTO } from "@/lib/types"
 
 export function shareText(sheet: SheetDTO, url: string) {
@@ -36,10 +37,12 @@ export function shareText(sheet: SheetDTO, url: string) {
 export async function shareLink(sheet: SheetDTO, url: string) {
   if (canNativeShare()) {
     const shared = await nativeShare({ title: sheet.title, text: `Sign up for "${sheet.title}"`, url })
-    if (shared) return
+    if (shared) return track("share", "native")
   }
-  if (await copyText(url)) toast.success("Link copied — paste it in your group chat")
-  else toast.error("Couldn't copy. Long-press the address bar to copy the link.")
+  if (await copyText(url)) {
+    track("share", "copy")
+    toast.success("Link copied — paste it in your group chat")
+  } else toast.error("Couldn't copy. Long-press the address bar to copy the link.")
 }
 
 export function ShareButton({ sheet, url, variant = "default" }: { sheet: SheetDTO; url: string; variant?: "default" | "outline" }) {
@@ -54,9 +57,11 @@ export function ShareButton({ sheet, url, variant = "default" }: { sheet: SheetD
 export function CopyListMenu({ sheet, url }: { sheet: SheetDTO; url: string }) {
   const text = shareText(sheet, url)
 
-  async function copy(value: string, label: string) {
-    if (await copyText(value)) toast.success(`${label} copied — paste it anywhere`)
-    else toast.error("Couldn't copy to your clipboard.")
+  async function copy(value: string, label: string, kind: "full" | "needed" | "link") {
+    if (await copyText(value)) {
+      track("copy_list", kind)
+      toast.success(`${label} copied — paste it anywhere`)
+    } else toast.error("Couldn't copy to your clipboard.")
   }
 
   return (
@@ -70,14 +75,14 @@ export function CopyListMenu({ sheet, url }: { sheet: SheetDTO; url: string }) {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" className="w-64">
         <DropdownMenuLabel>For your group chat</DropdownMenuLabel>
-        <DropdownMenuItem onSelect={() => copy(text.full(), "Full list")}>
+        <DropdownMenuItem onSelect={() => copy(text.full(), "Full list", "full")}>
           <ClipboardListIcon />
           <div>
             <p>Full list</p>
             <p className="text-xs text-muted-foreground">Everything, with who&apos;s on it</p>
           </div>
         </DropdownMenuItem>
-        <DropdownMenuItem onSelect={() => copy(text.needed(), "“Still needed” list")}>
+        <DropdownMenuItem onSelect={() => copy(text.needed(), "“Still needed” list", "needed")}>
           <MessageCircleIcon />
           <div>
             <p>Still needed</p>
@@ -85,7 +90,7 @@ export function CopyListMenu({ sheet, url }: { sheet: SheetDTO; url: string }) {
           </div>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onSelect={() => copy(url, "Link")}>
+        <DropdownMenuItem onSelect={() => copy(url, "Link", "link")}>
           <LinkIcon /> Just the link
         </DropdownMenuItem>
       </DropdownMenuContent>
@@ -102,6 +107,7 @@ export function MessengerLinks({ sheet, url }: { sheet: SheetDTO; url: string })
           href={`https://wa.me/?text=${encodeURIComponent(text.invite)}`}
           target="_blank"
           rel="noopener noreferrer"
+          onClick={() => track("share", "whatsapp")}
         >
           <WhatsAppIcon />
           WhatsApp
@@ -110,6 +116,7 @@ export function MessengerLinks({ sheet, url }: { sheet: SheetDTO; url: string })
       <Button variant="outline" asChild>
         <a
           href={`mailto:?subject=${encodeURIComponent(`Sign up: ${sheet.title}`)}&body=${encodeURIComponent(text.invite)}`}
+          onClick={() => track("share", "email")}
         >
           <MailIcon data-icon="inline-start" />
           Email
@@ -135,7 +142,7 @@ export function CalendarMenu({ sheet, url }: { sheet: SheetDTO; url: string }) {
       <DropdownMenuContent align="start">
         {google && (
           <DropdownMenuItem asChild>
-            <a href={google} target="_blank" rel="noopener noreferrer">
+            <a href={google} target="_blank" rel="noopener noreferrer" onClick={() => track("calendar", "google")}>
               <CalendarPlusIcon /> Google Calendar
             </a>
           </DropdownMenuItem>
@@ -143,7 +150,10 @@ export function CalendarMenu({ sheet, url }: { sheet: SheetDTO; url: string }) {
         <DropdownMenuItem
           onSelect={() => {
             const ics = buildIcs(sheet, url)
-            if (ics) downloadFile(`${slugify(sheet.title)}.ics`, ics, "text/calendar;charset=utf-8")
+            if (ics) {
+              downloadFile(`${slugify(sheet.title)}.ics`, ics, "text/calendar;charset=utf-8")
+              track("calendar", "ics")
+            }
           }}
         >
           <DownloadIcon /> Apple / Outlook (.ics)

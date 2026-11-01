@@ -1,3 +1,4 @@
+import { pruneVisitorHashes } from "@/lib/analytics"
 import { secretMatches, hashSecret } from "@/lib/tokens"
 import { json, route } from "@/lib/http"
 import { cleanupExpired } from "@/lib/sheets"
@@ -9,5 +10,6 @@ export const GET = route(async (req: Request) => {
   if (!secret || !secretMatches(provided, hashSecret(secret))) {
     return json({ error: { code: "unauthorized", message: "Unauthorized" } }, { status: 401 })
   }
-  return json(await cleanupExpired())
+  const result = await cleanupExpired()
+  return json({ ...result, prunedVisitorHashes: await pruneVisitorHashes() })
 })

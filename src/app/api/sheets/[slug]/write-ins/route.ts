@@ -1,4 +1,5 @@
-import type { NextRequest } from "next/server"
+import { after, type NextRequest } from "next/server"
+import { recordEventsSafely } from "@/lib/analytics"
 import { authFrom, clientIp, json, parseParam, readJson, route, slugParam } from "@/lib/http"
 import { enforceRateLimit } from "@/lib/rate-limit"
 import { writeIn } from "@/lib/sheets"
@@ -8,5 +9,7 @@ export const POST = route(async (req: NextRequest, ctx: RouteContext<"/api/sheet
   const slug = parseParam(slugParam, (await ctx.params).slug)
   await enforceRateLimit("write", clientIp(req))
   const input = await readJson(req, writeInInputSchema)
-  return json(await writeIn(slug, input, authFrom(req)), { status: 201 })
+  const result = await writeIn(slug, input, authFrom(req))
+  after(() => recordEventsSafely([{ metric: "claim_created", dim: "write_in" }]))
+  return json(result, { status: 201 })
 })

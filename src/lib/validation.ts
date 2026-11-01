@@ -104,6 +104,8 @@ export const sheetInputSchema = z
       .array(itemInputSchema)
       .min(1, "Add at least one item")
       .max(LIMITS.maxItems, `At most ${LIMITS.maxItems} items`),
+    // Which template the host started from (for anonymous usage stats only).
+    template: z.string().max(24).optional(),
     // Honeypot: real people never see or fill this field.
     website: z.string().max(0).optional(),
   })
