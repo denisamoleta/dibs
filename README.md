@@ -2,6 +2,8 @@
 
 **Who's bringing what? Sorted in one link.**
 
+**Live:** https://dibs-mauve-nine.vercel.app
+
 Dibs is a free, ad-free sign-up sheet for potlucks, volunteer shifts, meal trains, team snacks and class parties. The host makes a sheet in about 30 seconds and drops the link in the group chat. Everyone taps a spot to call dibs. Nobody needs an account or an app.
 
 - Live updates (adaptive polling with ETags)
